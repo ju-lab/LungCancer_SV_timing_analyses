@@ -16,7 +16,7 @@
  asdfasdf as *italic* asdfasdfsadf **bold** adsasdfsadfsadf
 
 
- ```{r}
+ ```r
 R script blabla
 
 function <- function(x = 10){
