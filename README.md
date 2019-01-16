@@ -1,11 +1,11 @@
 # Lung Adenocarcinoma Structural Variation and Amplification Timing Analyses
 
 ---
-1. Prepare BAMs
+## 1. Prepare BAMs
 
 We prepared paired tumor BAMs and normal BAMs. (e.g. A.tumor.bam, A.normal.bam). BAM files were aligned to the human genome reference (GRCh37 without the “chr” prefix in the contig name) by BWA-mem.
 
-##2. Run Delly somatic call
+## 2. Run Delly somatic call
 
 We ran Delly v0.7.6 (structural variation caller) with command as below. 
 Usage:
