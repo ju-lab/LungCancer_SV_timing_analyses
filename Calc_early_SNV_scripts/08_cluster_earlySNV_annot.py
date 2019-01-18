@@ -10,7 +10,7 @@ print('###'+sys.argv[0])
 print(sys.argv[3])
 seg_file=open(sys.argv[1]) 
 sv_file=open(sys.argv[2])  
-out_file=open(sys.argv[4]+'/'+sys.argv[3]+'.cl_time','w')
+out_file=open(sys.argv[4]+'/'+sys.argv[3]+'.cl_earlysnv','w')
 
 # make cluster list
 sv_line=sv_file.readline().strip()

@@ -1,14 +1,14 @@
 #argv1: /path/to/input
 #argv2: /path/to/normal_panel
-#argv3: panel_name
+#argv3: ref.fa.fai
 
-import sys
-print('### PON annotation')
+import sys,gzip
+print('###'+sys.argv[0])
 print(sys.argv[1])
 dist=200
 bin_size=1000000
 size_dic={}
-size_file=open('/home/users/sypark/02_Reference/15_pcawg/genome.fa.fai')
+size_file=open(sys.argv[3])
 size_line=size_file.readline().strip()
 while size_line:
 	size_indi=size_line.split('\t')
@@ -22,7 +22,11 @@ for chrom in size_dic.keys():
 	ref_dic[chrom]={}
 	for i in range(0, chrom_size/bin_size+1):
 		ref_dic[chrom][i]=[]
-ref_file=open(sys.argv[2])
+
+if sys.argv[2][-3:]=='.gz':
+	ref_file=gzip.open(sys.argv[2])
+else:
+	ref_file=open(sys.argv[2])
 ref_line=ref_file.readline().strip()
 while ref_line:
 	if ref_line[0]=='#':

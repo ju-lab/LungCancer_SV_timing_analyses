@@ -6,7 +6,7 @@ ampsizeco=10000000
 clsvn_co=5
 print(sys.argv[1])
 in_file=open(sys.argv[1])  # cl_time
-out_file=open(sys.argv[1]+'.merge','w')
+out_file=open(sys.argv[1]+'.merged','w')
 header_list=['#cluster', 'chr_list', 'dist', 'early_SNV', 'early_SNV_range', 'early_SNVrate/Mb', 'early_SNVrate_range', 'early_SNV_var','BPnum', 'cluster_SVnum']
 out_file.write('\t'.join(header_list)+'\n')
 cl_list=[]

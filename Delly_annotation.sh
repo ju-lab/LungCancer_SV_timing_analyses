@@ -19,7 +19,7 @@ echo "Starting:sorting"
 rm $vcf.somatic
 echo "done"
 echo "Starting:annotate PON"
-(python $srcDir/03.annotate_PON.py $vcf.somatic.sort $pon) &>> $log || { c=$?;echo "Error";exit $c; }
+(python $srcDir/03.annotate_PON.py $vcf.somatic.sort $pon $srcDir/hg19_ref.fa.fai) &>> $log || { c=$?;echo "Error";exit $c; }
 rm $vcf.somatic.sort
 echo "done"
 echo "Starting:find BP"

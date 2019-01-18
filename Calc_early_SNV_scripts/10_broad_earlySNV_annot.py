@@ -7,7 +7,7 @@ from operator import itemgetter
 print('###'+sys.argv[0])
 print(sys.argv[1])
 seg_file=open(sys.argv[1]) # segment with time info, *.ampseg.timeci.txt
-out_file=open(sys.argv[3]+'/'+sys.argv[2]+'.broadtime.txt','w') # id
+out_file=open(sys.argv[3]+'/'+sys.argv[2]+'.broad_earlysnv','w') # id
 header_list=['#broad_amp','dist','early_SNV','early_SNV_range', 'early_SNVrate/Mb', 'early_SNVrate_range', 'early_SNV_var']
 out_file.write('\t'.join(header_list)+'\n')
 seg_file.seek(0)

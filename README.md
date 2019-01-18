@@ -1,4 +1,8 @@
-# Lung Adenocarcinoma Structural Variation and Amplification Timing Analyses
+# Tracing Oncogene Rearrangements in the Mutational History of Lung Adenocarcinoma
+
+June-Koo Lee, Seongyeol Park, Hansol Park, Kijong Yi, Yohan An, Jeonghwan Youk, Junehawk Lee, Tae Min Kim, In Kyu Park, Chang Hyun Kang, Peter J Park, Young Seok Ju, and Young Tae Kim
+
+Detailed instructions for the step-by-step process are described in Supplemental information.
 
 ---
 ## 1. Prepare BAMs
