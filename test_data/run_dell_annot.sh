@@ -1,1 +1,0 @@
-sh ../Delly_annotation.sh test.delly.vcf 10 ~/00_Project/05_Rearrangement/02_Bam/LU-F16.tumor.bam ~/00_Project/05_Rearrangement/02_Bam/LU-F16.normal.bam ~/00_Project/05_Rearrangement/19_revision_total_samples/07_delly/01_normal_dic/merged_144s_delly_normal_panel.txt ../Delly_annotation_scripts/ &> run_delly.log
