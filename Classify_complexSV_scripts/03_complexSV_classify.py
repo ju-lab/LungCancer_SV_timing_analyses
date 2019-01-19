@@ -25,7 +25,7 @@ while sv_line:
 		'blank'
 	else:
 		sv_indi=sv_line.split('\t')
-		clustern=sv_indi[30]
+		clustern=sv_indi[26]
 		cluster_list.append(clustern)
 	sv_line=sv_file.readline().strip()
 
@@ -55,9 +55,9 @@ for clst in cluster_list:
 					dist=int(pos2)-int(pos1)
 					chrcn2=chrCN_dic[chr2]
 				svtype=sv_indi[6]
+				clustern=sv_indi[26]
 				gap1=sv_indi[27];seg1=sv_indi[28];gap2=sv_indi[29];seg2=sv_indi[30]
 				kbcn1=sv_indi[31];kbcn2=sv_indi[32];chrcn1=chrCN_dic[chr1]
-				clustern=sv_indi[30]
 				if clustern == clst:
 					totbp+=1
 					if pos2 !='.':
@@ -117,7 +117,7 @@ while sv_line:
 		out_file.write(sv_line+'\n')
 	else:
 		sv_indi=sv_line.split('\t')
-		clustern=sv_indi[30]
+		clustern=sv_indi[26]
 		if clustern not in classi_dic.keys():
 			out_file.write(sv_line+'\tNA\n')
 		else:

@@ -23,11 +23,11 @@ def count_earlySNV(chr1, pos1, pos2):
 			snv_indi=snv_line.split('\t')
 			snv_chr=snv_indi[0]
 			snv_pos=int(snv_indi[1])
-			kat=snv_indi[13]
-			pclonal=snv_indi[14]
-			pearly=snv_indi[15]
-			plate=snv_indi[16]
-			psubcl=snv_indi[17]
+			kat=snv_indi[16]
+			pclonal=snv_indi[17]
+			pearly=snv_indi[18]
+			plate=snv_indi[19]
+			psubcl=snv_indi[20]
 			if snv_chr == chr1 and snv_pos >=pos1 and snv_pos <=pos2 and kat=='F':
 				if (float(pclonal)==0 or math.isnan(float(pclonal))==True) and pearly=='.':
 					pearly=0
@@ -55,11 +55,11 @@ while snv_line:
 	else:
 		snv_indi=snv_line.split('\t')
 		tsnvn +=1
-		if snv_indi[14]=='.':
+		if snv_indi[17]=='.':
 			'blank'
 		else:
-			pclonal=float(snv_indi[14])
-			kat=snv_indi[13]
+			pclonal=float(snv_indi[17])
+			kat=snv_indi[16]
 			if kat == 'F':
 				tcln += pclonal
 				tclnV += pclonal*(1-pclonal)

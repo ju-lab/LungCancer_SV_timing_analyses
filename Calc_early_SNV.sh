@@ -24,20 +24,21 @@ echo "done"
 echo "Starting:Annotate mutCN to SNV"
 (python $srcDir/04_SNV_mutCN_CCF_annot.py $SNVfn.cninfo $purity ) &>> $log || { c=$?;echo "Error";exit $c; }
 echo "done"
-echo "Starting:SNV file sort"
-(python $srcDir/04.2_vcf_sorting.py $SNVfn.cninfo) &>> $log || { c=$?;echo "Error";exit $c; }
-echo "done"
 rm $SNVfn.cninfo
+echo "Starting:SNV file sort"
+(python $srcDir/04.2_vcf_sorting.py $SNVfn.cninfo.scF) &>> $log || { c=$?;echo "Error";exit $c; }
+echo "done"
+rm $SNVfn.cninfo.scF
 echo "Starting:Annotate kataegis to SNV"
-(python $srcDir/05_SNV_annot_kataegis.py $SNVfn.cninfo.sorted) &>> $log || { c=$?;echo "Error";exit $c; }
+(python $srcDir/05_SNV_annot_kataegis.py $SNVfn.cninfo.scF.sorted) &>> $log || { c=$?;echo "Error";exit $c; }
 echo "done"
-rm $SNVfn.cninfo.sorted
+rm $SNVfn.cninfo.scF.sorted
 echo "Starting:Annotate SNV probability"
-(python $srcDir/06_SNV_timing_probability.py $SNVfn.cninfo.sorted.kat $purity) &>> $log || { c=$?;echo "Error";exit $c; }
+(python $srcDir/06_SNV_timing_probability.py $SNVfn.cninfo.scF.sorted.kat $purity) &>> $log || { c=$?;echo "Error";exit $c; }
 echo "done"
-rm $SNVfn.cninfo.sorted.kat
+rm $SNVfn.cninfo.scF.sorted.kat
 echo "Starting:Annotate earlySNV to CNV"
-(python $srcDir/07_Annot_EarlySNVCount_to_AmpSeg.py $Seqz.edit.broadAMP $SNVfn.cninfo.sorted.kat.proba $sampleid $outDir) &>> $log || { c=$?;echo "Error";exit $c; }
+(python $srcDir/07_Annot_EarlySNVCount_to_AmpSeg.py $Seqz.edit.broadAMP $SNVfn.cninfo.scF.sorted.kat.proba $sampleid $outDir) &>> $log || { c=$?;echo "Error";exit $c; }
 echo "done"
 echo "Starting:Annotate earlySNV of cluster"
 (python $srcDir/08_cluster_earlySNV_annot.py $outDir/$sampleid.ampseg.earlysnv.txt $SVfn $sampleid $outDir ) &>> $log || { c=$?;echo "Error";exit $c; }

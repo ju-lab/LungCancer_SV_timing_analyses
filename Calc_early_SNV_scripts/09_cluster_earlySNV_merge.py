@@ -51,13 +51,7 @@ for clst in cl_list:
 		hearlyn_sum = earlyn_sum + 1.96*math.sqrt(earlyv_sum)
 		learlyr=round(learlyn_sum*1000000/float(dist_sum),4)
 		hearlyr=round(hearlyn_sum*1000000/float(dist_sum),4)
-		earlyar=round(earlyr/float(tclr),4)
-		learlyar=round(learlyr/float(tclr),4)
-		hearlyar=round(hearlyr/float(tclr),4)
-		earlyar2=round(earlyr/float(tsnvr),4)
-		learlyar2=round(learlyr/float(tsnvr),4)
-		hearlyar2=round(hearlyr/float(tsnvr),4)
 		chr_list=';'.join(target_chr_list)
 
-		info_list=[clst,chr_list,str(dist_sum), str(earlyn_sum), str(learlyn_sum)+':'+str(hearlyn_sum),str(earlyr), str(learlyr)+':'+str(hearlyr),str(tcln),str(tclr),str(tsnvn),str(tsnvr),str(earlyar),str(learlyar)+':'+str(hearlyar),str(earlyar2),str(learlyar2)+':'+str(hearlyar2),tclnr, tclnrr, str(earlyv_sum), str(bp_sum),str(cl_svn)]
+		info_list=[clst,chr_list,str(dist_sum), str(earlyn_sum), str(learlyn_sum)+':'+str(hearlyn_sum),str(earlyr), str(learlyr)+':'+str(hearlyr),str(earlyv_sum), str(bp_sum),str(cl_svn)]
 		out_file.write('\t'.join(info_list)+'\n')
