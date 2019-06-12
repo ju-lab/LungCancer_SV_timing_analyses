@@ -1,6 +1,9 @@
 #Arg1: delly output file
 #Arg2: column number of tumor information in delly output
 
+#2019-06-11: nDV+nRV>0 -> genotype != '0/0'
+
+
 import sys
 print('###filter somatic')
 print(sys.argv[1])
@@ -25,9 +28,11 @@ while in_line:
 		tRV=int(in_indi[tcol].split(':')[11])
 		nDV=int(in_indi[ncol].split(':')[9])
 		nRV=int(in_indi[ncol].split(':')[11])
+		nGT=in_indi[ncol].split(':')[0]
 		if tDV+tRV==0: #filter out
 			m=m+1
-		elif nDV+nRV>0:  #filter out
+#		elif nDV+nRV>0:  #filter out
+		elif nGT != '0/0': #filter out
 			m=m+1
 		else:
 			out_file.write(in_line+'\n')

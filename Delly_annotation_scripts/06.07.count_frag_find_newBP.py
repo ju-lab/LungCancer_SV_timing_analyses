@@ -3,6 +3,8 @@
 #Arg3: normal bam
 
 
+#2019-06-11 remove condition about supplementary or secondary reads
+
 import sys,pysam, collections,  itertools
 print('### SVvaf new BP')
 print(sys.argv[1])
@@ -249,7 +251,7 @@ def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_
 	pair_true_list=[];sp_true_list=[];sa_true_list=[]
 	pair_ref_list=[]; jx_ref_list=[]
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
-		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
+		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		if read.has_tag('SA')== True and ((ter1==3 and (read.cigartuples[-1][0]==4 or read.cigartuples[-1][0]==5)) or (ter1==5 and (read.cigartuples[0][0] ==4 or read.cigartuples[0][0] ==5))):
 			SA_list=str(read.get_tag('SA')).split(';')[:-1]
 			if read.is_reverse == True: PA_strand='+'
@@ -287,7 +289,7 @@ def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_
 						neo_mate_list=neo_mate_list+sa_res[1]
 		sa_seq_list=list(set(sa_seq_list))
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
-		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
+		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		pair_ref_mode='off';jx_ref_mode='off'
 		if ter1==3:
 			if read.is_reverse == False and read.mate_is_reverse == True and read.next_reference_name == chr1 and read.reference_start +1 < pos1 and read.reference_start +1 +read.template_length -1 > pos1 and read.template_length >= 0 and read.template_length < iscut: 
@@ -404,7 +406,7 @@ def calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_bam, n_bam):
 def count_frag_num(chr1, pos1, pysam_file):
 	pos1=int(pos1);total_frag_list=[]
 	for read in pysam_file.fetch(chr1, pos1-1, pos1):
-		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
+		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		total_frag_list.append(read.query_name)
 	total_frag_list=list(set(total_frag_list))
 	return len(total_frag_list)

@@ -10,7 +10,7 @@ in_line=in_file.readline().strip()
 n=0
 while in_line:
 	if in_line[0]=='#':
-		'blank'
+		out_file.write(in_line+'\n')
 	else:
 		input_lines.append(in_line)
 		n=n+1

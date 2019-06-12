@@ -22,6 +22,8 @@ while in_line:
 		cluster_num=in_line.split('cluster')[1]
 		c_list.append(int(cluster_num))
 		in_dic[cluster_num]=[]
+	elif in_line[0]=='#':
+		out_file.write(in_line+'\n')
 	else:
 		n+=1
 		in_dic[cluster_num].append(in_line)
