@@ -4,6 +4,7 @@
 
 
 #2019-06-11 remove condition about supplementary or secondary reads
+#2019-10-01 minor error correction
 
 import sys,pysam, collections,  itertools
 print('### SVvaf new BP')
@@ -424,7 +425,7 @@ while sv_line:
 		chr1=sv_indi[c_chr1]; pos1=sv_indi[c_pos1]; chr2=sv_indi[c_chr2]; pos2=sv_indi[c_pos2]
 		svtype=sv_indi[c_type]
 		if pos2 == '.' or svtype == 'INS': 
-			print_list[sv_line, '.','.','.','.','.','.']
+			print_list=[sv_line, '.','.','.','.','.','.']
 		else:
 			ter1=sv_indi[c_ter].split('to')[0]; ter2=sv_indi[c_ter].split('to')[1]
 			res = calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_file, n_file)
