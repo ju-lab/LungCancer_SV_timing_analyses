@@ -1,5 +1,6 @@
 #181231: majCN == 'NA'
 #191001: condition for input without quotation mark at chromosome name
+#191206: majcn == 'NA': majcn = totcn; mincn = 0
 
 import sys,os
 print('###'+sys.argv[0])
@@ -23,8 +24,8 @@ while in_line:
 		totcn=in_indi[9]
 		majcn=in_indi[10]
 		mincn=in_indi[11]
-		if totcn =='1' and majcn =='NA':
-			majcn ='1'
+		if majcn =='NA':
+			majcn =totcn
 			mincn = '0'
 		info_list=[chr1, st_pos, ed_pos, totcn, majcn, mincn]
 		out_file.write('\t'.join(info_list)+'\n')

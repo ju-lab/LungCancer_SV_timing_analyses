@@ -1,5 +1,5 @@
-#arg1:CNV file
-#arg2:SV file
+#arg1:CNV file	#chr\tstart.pos\tend.pos
+#arg2:SV file  #CHR1\tPOS1\tCHR2\tPOS2
 
 import sys
 s_ra=20000   # SV CNV bp merge search range
@@ -66,7 +66,7 @@ while ref_line:
 		chr1=ref_indi[0]
 		pos1=ref_indi[1]
 		chr2=ref_indi[2]
-		pos2=ref_indi[1]
+		pos2=ref_indi[3]
 		for bp in bp_dic[chr1]:
 			if abs(int(pos1)-bp) < s_ra:
 				del bp_dic[chr1][bp_dic[chr1].index(bp)]
