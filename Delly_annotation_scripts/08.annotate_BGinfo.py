@@ -2,6 +2,7 @@
 #Arg2 tumor_bam
 #Arg2 normal_bam
 
+#2020-04-12 add read number limitation as 50000
 
 import sys, pysam
 print('### Annotate BGinfo')
@@ -14,6 +15,7 @@ out_file=open(sys.argv[1]+'.bginfo','w')
 ser=300 # search range from breakpoint
 iscut=1000 # insert size cutoff for normal pair
 mate_bin=100000 #mate location binning range
+r_limit = 50000 # the number of reads that count in this script
 #Assign the column number starting from 1
 c_chr1=15
 c_pos1=16
@@ -29,7 +31,11 @@ def amount_discordant(chr1, pos1, pysam_file):
 	pos1=int(pos1)
 	pos1_start=max(pos1-ser, 1)
 	pos1_end=pos1+ser
+	n=0
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
 		if read.mapping_quality < 1: continue
 		total_frag_list.append(read.query_name)

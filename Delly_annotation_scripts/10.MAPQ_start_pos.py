@@ -5,6 +5,7 @@
 #181210 From now on, juntional ref reads is not considered when pass the variant reads.;real_read_start_position
 #181212 minor error correction
 #181225 pair-ref definition: add mate_is_reverse
+#200412 set read limitation as 50000
 
 import sys,pysam, collections,  itertools,numpy
 
@@ -17,6 +18,7 @@ fors=700; bacs=5  # search range for pairread counting # You can adjust these va
 iscut=700 # insert size cut for call reference pair # You can adjust this value.
 shortDco=500
 sc_co=5  # number of bases which is used to differentiate discordant soft-clipping
+r_limit = 5000 # The number or reads that this script searches for anlaysis
 
 sv_line=sv_file.readline().strip()
 #Assign the column number starting from 1
@@ -235,7 +237,7 @@ def mate_list_summary(mate_list):
 		final_list.append(info+';'+str(m1max)+';'+str(m2max)+'('+str(freq)+')')
 	return (','.join(final_list))
 
-def find_discordant_reads_tumor(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file):
+def find_discordant_reads_tumor(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file, r_limit):
 	pos1=int(pos1); pos2=int(pos2); ter1=int(ter1); ter2=int(ter2)
 	if ter1==3: pos1_start=pos1-fors; pos1_end=pos1+bacs
 	elif ter1==5: pos1_start=pos1-bacs; pos1_end=pos1+fors
@@ -252,7 +254,11 @@ def find_discordant_reads_tumor(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file):
 	pair_ref_list=[]; jx_ref_list=[]
 	true_mapq_list=[]; true_pos_list=[]
 	sa_seq_list=[]
+	n=0
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
+		n = n +1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
 		if read.has_tag('SA')== True:
 			SA_list=str(read.get_tag('SA')).split(';')[:-1]
@@ -289,7 +295,11 @@ def find_discordant_reads_tumor(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file):
 						sc_seq=read.query_sequence[read.cigartuples[0][1]-1-sc_co+1:read.cigartuples[0][1]-1+1]
 						sa_seq_list.append(sc_seq)
 		sa_seq_list=list(set(sa_seq_list))
+	n=0
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
 		pair_ref_mode='off';jx_ref_mode='off'
 		if ter1==3:
@@ -353,17 +363,6 @@ def find_discordant_reads_tumor(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file):
 	all_true_list=list(set(pair_true_list+sp_true_list+sa_true_list))
 	return([pair_true_list, sp_true_list, sa_true_list, pair_ref_list, jx_ref_list, all_ref_list, sa_seq_list, true_mapq_list, true_pos_list])
 
-
-def count_frag_num(chr1, pos1, pysam_file):
-	pos1=int(pos1);total_frag_list=[]
-	for read in pysam_file.fetch(chr1, pos1-1, pos1):
-		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
-		total_frag_list.append(read.query_name)
-	total_frag_list=list(set(total_frag_list))
-	return len(total_frag_list)
-
-
-
 while sv_line:
 	if sv_line[0:4]=='#CHR':
 		out_file.write(sv_line+'\tMAPQ1_min;med;max\tMAPQ2_min;med;max\tPOS1_min;med;max\tPOS2_min;med;max\n')
@@ -378,10 +377,10 @@ while sv_line:
 			out_file.write(sv_line+'\tNA\tNA\tNA\tNA\n')
 		else:
 			ter1=sv_indi[c_ter].split('to')[0]; ter2=sv_indi[c_ter].split('to')[1]
-			res=find_discordant_reads_tumor(chr1,pos1,ter1,chr2,pos2,ter2,t_file)
+			res=find_discordant_reads_tumor(chr1,pos1,ter1,chr2,pos2,ter2,t_file, r_limit)
 			mapq_list1=res[7]
 			pos_list1=res[8]
-			res=find_discordant_reads_tumor(chr2,pos2,ter2,chr1,pos1,ter1,t_file)
+			res=find_discordant_reads_tumor(chr2,pos2,ter2,chr1,pos1,ter1,t_file, r_limit)
 			mapq_list2=res[7]
 			pos_list2=res[8]
 			if len(mapq_list1)==0:

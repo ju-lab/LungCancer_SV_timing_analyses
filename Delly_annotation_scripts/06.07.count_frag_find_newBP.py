@@ -5,6 +5,7 @@
 
 #2019-06-11 remove condition about supplementary or secondary reads
 #2019-10-01 minor error correction
+#2020-04-12 add reads number limitation as 50000
 
 import sys,pysam, collections,  itertools
 print('### SVvaf new BP')
@@ -17,7 +18,7 @@ fors=700; bacs=5  # search range for pairread counting # You can adjust these va
 iscut=700 # insert size cut for call reference pair # You can adjust this value.
 shortDco=500
 sc_co=5  # number of bases which is used to differentiate discordant soft-clipping
-
+r_limit = 50000 # The number of reads that this script searches for analysis
 sv_line=sv_file.readline().strip()
 #Assign the column number starting from 1
 c_chr1=15
@@ -235,7 +236,7 @@ def mate_list_summary(mate_list):
 		final_list.append(info+';'+str(m1max)+';'+str(m2max)+'('+str(freq)+')')
 	return (','.join(final_list))
 
-def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_list):
+def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_list, r_limit):
 	pos1=int(pos1); pos2=int(pos2); ter1=int(ter1); ter2=int(ter2)
 	new_mate_list=[];neo_mate_list=[]
 	if ter1==3: pos1_start=pos1-fors; pos1_end=pos1+bacs
@@ -251,7 +252,11 @@ def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_
 		pos1_start=max(pos1_start, pos1-(pos1-pos2)/2)
 	pair_true_list=[];sp_true_list=[];sa_true_list=[]
 	pair_ref_list=[]; jx_ref_list=[]
+	n=0
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
+		n= n+1
+		if n > r_limit :
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		if read.has_tag('SA')== True and ((ter1==3 and (read.cigartuples[-1][0]==4 or read.cigartuples[-1][0]==5)) or (ter1==5 and (read.cigartuples[0][0] ==4 or read.cigartuples[0][0] ==5))):
 			SA_list=str(read.get_tag('SA')).split(';')[:-1]
@@ -289,7 +294,11 @@ def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_
 						new_mate_list=new_mate_list+sa_res[0]
 						neo_mate_list=neo_mate_list+sa_res[1]
 		sa_seq_list=list(set(sa_seq_list))
+	n=0
 	for read in pysam_file.fetch(chr1, pos1_start-1, pos1_end):
+		n = n +1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		pair_ref_mode='off';jx_ref_mode='off'
 		if ter1==3:
@@ -352,22 +361,22 @@ def find_discordant_reads(chr1, pos1, ter1, chr2, pos2, ter2, pysam_file,sa_seq_
 	return([pair_true_list, sp_true_list, sa_true_list, pair_ref_list, jx_ref_list, all_ref_list, sa_seq_list, new_mate,neo_mate])
 
 
-def calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_bam, n_bam):
+def calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_bam, n_bam, r_limit):
 	pos1=int(pos1); pos2=int(pos2); ter1=int(ter1); ter2=int(ter2)
 	a1=0; as1=0; asa1=0;r1=0;rj1=0; r2=0; rj2=0; na1=0; nsa1=0
 	normal_split1='off';normal_split2='off'
 	sa_seq_list=[]
-	t1_list=find_discordant_reads(chr1,pos1,ter1,chr2,pos2,ter2,t_bam,sa_seq_list)
+	t1_list=find_discordant_reads(chr1,pos1,ter1,chr2,pos2,ter2,t_bam,sa_seq_list, r_limit)
 	sa_seq_list=t1_list[6]
 	new_mate1=t1_list[7]
 	neo_mate1=t1_list[8]
-	n1_list=find_discordant_reads(chr1,pos1,ter1,chr2,pos2,ter2,n_bam,sa_seq_list)
+	n1_list=find_discordant_reads(chr1,pos1,ter1,chr2,pos2,ter2,n_bam,sa_seq_list, r_limit)
 	sa_seq_list=[]
-	t2_list=find_discordant_reads(chr2,pos2,ter2,chr1,pos1,ter1,t_bam,sa_seq_list)
+	t2_list=find_discordant_reads(chr2,pos2,ter2,chr1,pos1,ter1,t_bam,sa_seq_list, r_limit)
 	sa_seq_list=t2_list[6]
 	new_mate2=t2_list[7]
 	neo_mate2=t2_list[8]
-	n2_list=find_discordant_reads(chr2,pos2,ter2,chr1,pos1,ter1,n_bam,sa_seq_list)
+	n2_list=find_discordant_reads(chr2,pos2,ter2,chr1,pos1,ter1,n_bam,sa_seq_list, r_limit)
 
 	n1_pair_list=n1_list[0]
 	n1_sp_list=n1_list[1]
@@ -404,9 +413,13 @@ def calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_bam, n_bam):
 	return([t_tot_n, t_split_n,t_sa_n, t1_reftot_n, t1_refjx_n, t2_reftot_n, t2_refjx_n, n_tot_n, n_sa_n, new_mate1, neo_mate1, new_mate2, neo_mate2])
 
 
-def count_frag_num(chr1, pos1, pysam_file):
+def count_frag_num(chr1, pos1, pysam_file, r_limit):
 	pos1=int(pos1);total_frag_list=[]
+	n=0
 	for read in pysam_file.fetch(chr1, pos1-1, pos1):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_duplicate == True: continue
 		total_frag_list.append(read.query_name)
 	total_frag_list=list(set(total_frag_list))
@@ -428,11 +441,11 @@ while sv_line:
 			print_list=[sv_line, '.','.','.','.','.','.']
 		else:
 			ter1=sv_indi[c_ter].split('to')[0]; ter2=sv_indi[c_ter].split('to')[1]
-			res = calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_file, n_file)
+			res = calc_final_count(chr1, pos1, ter1, chr2, pos2, ter2, t_file, n_file, r_limit)
 			adf=res[0];sf=res[1];saf=res[2];ref1=res[3];rj1=res[4];ref2=res[5];rj2=res[6];na1=res[7];nsa1=res[8]
 			new_mate1=res[9]; neo_mate1=res[10]; new_mate2=res[11]; neo_mate2=res[12]
-			pnfc1=count_frag_num(chr1, pos1, n_file)
-			pnfc2=count_frag_num(chr2, pos2, n_file)
+			pnfc1=count_frag_num(chr1, pos1, n_file, r_limit)
+			pnfc2=count_frag_num(chr2, pos2, n_file, r_limit)
 	
 			if chr1 == chr2 and ter1 == '3' and ter2 == '5' and abs(int(pos2)-int(pos1)) < shortDco:
 				adf=sf

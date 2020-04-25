@@ -2,6 +2,8 @@
 #Arg2: tumor bam
 #Arg3: normal bam
 
+# 2020-04-12 add read limitation as 50000
+
 
 import sys,pysam
 print('### find same clipping')
@@ -14,6 +16,7 @@ out_file=open(sys.argv[1]+'.pnsc','w')
 fors=500;bacs=5
 n_sr=10 # normal search range 
 sc_co=5
+r_limit = 50000 # The number of reads that this script searches for analysis
 sv_line=sv_file.readline().strip()
 #Assign the column number starting from 1
 c_chr1=15
@@ -49,7 +52,7 @@ def make_cigartuple(cigarstring):
 
 
 
-def find_pnsc(chr1,pos1,ter1, chr2,pos2,ter2, t_file, n_file):
+def find_pnsc(chr1,pos1,ter1, chr2,pos2,ter2, t_file, n_file, r_limit):
 	sa_seq_list=[];sp_true_list=[]
 	pos1=int(pos1);pos2=int(pos2)
 	if ter1==3: pos1_start=pos1-fors; pos1_end=pos1+bacs
@@ -63,7 +66,11 @@ def find_pnsc(chr1,pos1,ter1, chr2,pos2,ter2, t_file, n_file):
 	elif chr1 == chr2 and ter1==3 and ter2 ==5 and pos2 < pos1:
 		pos2_end=min(pos2_end, pos2+(pos1-pos2)/2)
 		pos1_start=max(pos1_start, pos1-(pos1-pos2)/2)
+	n=0
 	for read in t_file.fetch(chr1, pos1_start-1, pos1_end):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
 		if read.has_tag('SA')== True:
 			SA_list=str(read.get_tag('SA')).split(';')[:-1]
@@ -105,7 +112,11 @@ def find_pnsc(chr1,pos1,ter1, chr2,pos2,ter2, t_file, n_file):
 						sc_seq=read.query_sequence[read.cigartuples[0][1]-1-sc_co+1:read.cigartuples[0][1]-1+1]
 						sa_seq_list.append(sc_seq)
 	sa_seq_list=list(set(sa_seq_list))
+	n=0
 	for read in n_file.fetch(chr1, max(1,pos1-1-n_sr), pos1+n_sr):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.is_unmapped == True or read.is_paired == False or read.mate_is_unmapped == True or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True: continue
 		if ter1==3:
 			if len(sa_seq_list) > 0:
@@ -136,8 +147,8 @@ while sv_line:
 			pnsc=0
 		else:
 			ter1=int(ter1);ter2=int(ter2)
-			pnsc1=find_pnsc(chr1,pos1,ter1,chr2,pos2,ter2,t_file,n_file)
-			pnsc2=find_pnsc(chr2,pos2,ter2,chr1,pos1,ter1,t_file,n_file)
+			pnsc1=find_pnsc(chr1,pos1,ter1,chr2,pos2,ter2,t_file,n_file, r_limit)
+			pnsc2=find_pnsc(chr2,pos2,ter2,chr1,pos1,ter1,t_file,n_file, r_limit)
 			pnsc=pnsc1+pnsc2
 		out_file.write(sv_line+'\t'+str(pnsc)+'\n')
 	sv_line=sv_file.readline().strip()

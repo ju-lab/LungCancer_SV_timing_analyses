@@ -2,6 +2,7 @@
 #Arg2: Tumor bam
 #Arg3: Normal bam
 
+#2020-04-12 set read limitation as 50000
 
 import sys, pysam
 import collections
@@ -14,6 +15,7 @@ tbam_file=pysam.AlignmentFile(sys.argv[2],'rb')  # Cancer bam
 nbam_file=pysam.AlignmentFile(sys.argv[3],'rb') #Normal bam
 out_file=open(sys.argv[1]+'.BPinfo','w')
 fors=700; bacs=100  #cut-off check! bacs must be smaller than fors
+r_limit = 50000 # The number of reads that this script searches for analysis
 
 def make_cigartuple(cigarstring):
 	cg_num=len(cigarstring)
@@ -78,12 +80,16 @@ def change_chr_to_int(chr1):
 	return(chr_n)
 
 
-def find_SA_reads(chr1,start1, end1, chr2, target_start2, target_end2, bam_file):
+def find_SA_reads(chr1,start1, end1, chr2, target_start2, target_end2, bam_file, r_limit):
 	saINFO=[]
 	reverse_list=['1','3','5','7','9','b','d','f']
 	start1=max(start1,1)
 	end1=max(end1,1)
+	n = 0
 	for read in bam_file.fetch(chr1,start1-1,end1):
+		n = n+1
+		if n > r_limit:
+			break
 		if read.cigartuples == None or read.is_secondary == True or read.is_supplementary == True or read.is_duplicate == True:
 			continue
 		if read.has_tag('SA'):
@@ -270,8 +276,8 @@ while dl_line:
 				target_start2=pos2-bacs
 				target_end2=pos2+fors
 
-		t_list1=find_SA_reads(chr1, start1, end1, chr2, target_start2, target_end2,tbam_file)
-		t_list2=find_SA_reads(chr2, start2, end2, chr1, target_start1, target_end1,tbam_file)
+		t_list1=find_SA_reads(chr1, start1, end1, chr2, target_start2, target_end2,tbam_file, r_limit)
+		t_list2=find_SA_reads(chr2, start2, end2, chr1, target_start1, target_end1,tbam_file, r_limit)
 		t_list=t_list1+t_list2
 		if len(t_list) > 0:
 			t_dic=collections.Counter(t_list)
@@ -282,8 +288,8 @@ while dl_line:
 		else:
 			t_info='NA'
 
-		n_list1=find_SA_reads(chr1, start1, end1, chr2, target_start2, target_end2, nbam_file)
-		n_list2=find_SA_reads(chr2, start2, end2, chr1, target_start1, target_end1, nbam_file)
+		n_list1=find_SA_reads(chr1, start1, end1, chr2, target_start2, target_end2, nbam_file, r_limit)
+		n_list2=find_SA_reads(chr2, start2, end2, chr1, target_start1, target_end1, nbam_file, r_limit)
 		n_list=n_list1+n_list2
 		if len(n_list) > 0:
 			n_dic=collections.Counter(n_list)
