@@ -5,11 +5,9 @@ tumorBam=$3
 normalBam=$4
 pon=$5
 srcDir=$6
-outDir=$(dirname $vcf)
 
 
 # START
-echo $vcf > $log
 echo "Starting:filter somatic"
 (python $srcDir/01.filter_somatic_delly.py $vcf $tumor_col) || { c=$?;echo "Error";exit $c; }
 echo "done"

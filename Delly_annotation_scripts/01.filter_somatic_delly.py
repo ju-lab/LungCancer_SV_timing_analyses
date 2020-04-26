@@ -4,6 +4,7 @@
 #2019-06-11: nDV+nRV>0 -> genotype != '0/0'
 #2020-04-26: svtype == 'DEL' and pos2-pos1 < 1000 and nRV > 1 -> filter out
 #2020-04-26: (svype != 'DEL' or pos1-pos1 >= 1000) and nDV > 1 -> filter out
+#2020-04-27: chr1 == chr2 and pos2-pos1 < 1000 and nRV > 1 -> filter out; (chr1 != chr2 or pos1-pos1 >= 1000) and nDV >1 -> filter out
 
 
 
@@ -28,7 +29,7 @@ while in_line:
 	else:
 		in_indi=in_line.split('\t')
 		chr1=in_indi[0]
-		pos1=int(in_indi[1]
+		pos1=int(in_indi[1])
 		chr2=(in_indi[7].split('CHR2=')[1]).split(';')[0]
 		pos2=int((in_indi[7].split('END=')[1]).split(';')[0])
 		svtype=(in_indi[7].split('SVTYPE=')[1]).split(';')[0]
@@ -41,9 +42,9 @@ while in_line:
 			m=m+1
 		elif nGT != '0/0': #filter out
 			m=m+1
-		elif svtype == 'DEL' and pos2-pos1 < 1000 and nRV > 1:
+		elif chr1 == chr2 and pos2-pos1 < 1000 and nRV > 1:
 			'blank'
-		elif (svype != 'DEL' or pos1-pos1 >= 1000) and nDV > 1:
+		elif (chr1 != chr2 or pos1-pos1 >= 1000) and nDV > 1:
 			'blank'
 		else:
 			out_file.write(in_line+'\n')
